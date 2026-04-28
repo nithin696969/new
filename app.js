@@ -94,7 +94,49 @@ function setFeedback(message, isError = false) {
 function updateSummary() {
   elements.sourceStatus.textContent = state.sourceLabel;
   elements.schemeCount.textContent = state.schemes.length.toLocaleString("en-IN");
-  elements.latestNavDate.textContent = state.schemes[0]?.date || "-";
+  elements.latestNavDate.textContent = getLatestNavDate(state.schemes) || "-";
+}
+
+function parseAmfiDate(dateText) {
+  const [day, month, year] = dateText.split("-");
+  if (!day || !month || !year) {
+    return null;
+  }
+
+  const monthIndex = [
+    "jan", "feb", "mar", "apr", "may", "jun",
+    "jul", "aug", "sep", "oct", "nov", "dec"
+  ].indexOf(month.toLowerCase());
+
+  if (monthIndex === -1) {
+    return null;
+  }
+
+  const parsedDate = new Date(Date.UTC(Number.parseInt(year, 10), monthIndex, Number.parseInt(day, 10)));
+  if (Number.isNaN(parsedDate.getTime())) {
+    return null;
+  }
+
+  return parsedDate;
+}
+
+function getLatestNavDate(schemes) {
+  let latestDate = null;
+  let latestLabel = "";
+
+  for (const scheme of schemes) {
+    const parsedDate = parseAmfiDate(scheme.date);
+    if (!parsedDate) {
+      continue;
+    }
+
+    if (!latestDate || parsedDate > latestDate) {
+      latestDate = parsedDate;
+      latestLabel = scheme.date;
+    }
+  }
+
+  return latestLabel;
 }
 
 function populateOptions() {
