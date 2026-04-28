@@ -31,7 +31,7 @@ Frontend app for calculating mutual fund holding value from AMFI NAV data, bundl
 1. Push this repository to GitHub.
 2. In Railway, create a new project and choose **Deploy from GitHub repo**.
 3. Select this repository and branch.
-4. Railway automatically detects Node.js via `package.json` and runs `npm start`.
+4. Railway uses `railway.toml` + `Dockerfile` to build and run the app consistently (`node server.js`).
 5. After deployment, open the generated Railway URL.
 
 ### Railway runtime notes
