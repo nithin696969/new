@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AMFI Portfolio Value Tracker</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+  <div class="page-shell">
+    <header class="hero">
+      <div class="hero-copy">
+        <p class="eyebrow">AMFI mutual fund utility</p>
+        <h1>Portfolio value from fund name and units</h1>
+        <p class="hero-text">
+          Load the AMFI NAV text, pick a scheme, enter units, and the app will calculate the current holding value instantly.
+        </p>
+      </div>
+      <div class="hero-card">
+        <div class="stat">
+          <span class="stat-label">Source</span>
+          <strong id="sourceStatus">Waiting for NAV data</strong>
+        </div>
+        <div class="stat">
+          <span class="stat-label">Schemes loaded</span>
+          <strong id="schemeCount">0</strong>
+        </div>
+        <div class="stat">
+          <span class="stat-label">Latest NAV date</span>
+          <strong id="latestNavDate">-</strong>
+        </div>
+      </div>
+    </header>
+
+    <main class="layout">
+      <section class="panel source-panel">
+        <div class="section-heading">
+          <h2>Load NAV data</h2>
+          <p>Use live fetch when it works. If the browser blocks it, paste the AMFI file contents here.</p>
+        </div>
+
+        <div class="button-row">
+          <button id="fetchAmfiBtn" class="primary-btn" type="button">Fetch live AMFI data</button>
+          <button id="useSampleBtn" class="ghost-btn" type="button">Load sample data</button>
+          <button id="clearDataBtn" class="ghost-btn" type="button">Clear</button>
+        </div>
+
+        <label class="textarea-label" for="navText">AMFI NAV text</label>
+        <textarea id="navText" spellcheck="false" placeholder="Paste NAVAll.txt contents here if live fetch does not work."></textarea>
+
+        <div class="button-row">
+          <button id="parseTextBtn" class="primary-btn" type="button">Parse pasted data</button>
+        </div>
+
+        <p id="feedback" class="feedback" role="status" aria-live="polite"></p>
+      </section>
+
+      <section class="panel calculator-panel">
+        <div class="section-heading">
+          <h2>Portfolio calculator</h2>
+          <p>Select a scheme, enter units, and review value with the latest available NAV.</p>
+        </div>
+
+        <div class="form-grid">
+          <label class="field">
+            <span>Fund name</span>
+            <input id="schemeSearch" list="schemeOptions" placeholder="Search scheme name">
+            <datalist id="schemeOptions"></datalist>
+          </label>
+
+          <label class="field">
+            <span>Units</span>
+            <input id="unitsInput" type="number" min="0" step="0.0001" placeholder="0.0000">
+          </label>
+        </div>
+
+        <div class="value-card">
+          <p class="value-label">Portfolio value</p>
+          <h3 id="portfolioValue">Rs 0.00</h3>
+          <div class="value-meta">
+            <span id="selectedNav">NAV: -</span>
+            <span id="selectedDate">Date: -</span>
+          </div>
+        </div>
+
+        <div class="scheme-details" id="schemeDetails">
+          <p>Select a fund after loading data to see scheme details.</p>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script src="./app.js"></script>
+</body>
+</html>
