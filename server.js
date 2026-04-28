@@ -20,7 +20,18 @@ const MIME_TYPES = {
 };
 
 function resolvePath(urlPath) {
+ codex/fix-issues-for-railway-deployment-chjywf
+  let decodedPath = urlPath;
+  try {
+    decodedPath = decodeURIComponent(urlPath);
+  } catch (error) {
+    return null;
+  }
+
+  const safePath = path.normalize(decodedPath).replace(/^([.][.][\/\\])+/, '');
+
   const safePath = path.normalize(decodeURIComponent(urlPath)).replace(/^([.][.][\/\\])+/, '');
+ main
   return path.join(rootDir, safePath);
 }
 
@@ -55,17 +66,35 @@ function sendFile(filePath, res) {
 }
 
 const server = http.createServer((req, res) => {
+ codex/fix-issues-for-railway-deployment-chjywf
+  const requestPathname = (req.url || '/').split('?')[0];
+
+  if (requestPathname === '/health') {
+
   const requestUrl = new URL(req.url, `http://${req.headers.host}`);
 
   if (requestUrl.pathname === '/health') {
+ main
     res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8' });
     res.end(JSON.stringify({ status: 'ok' }));
     return;
   }
 
+ codex/fix-issues-for-railway-deployment-chjywf
+  const requestPath = requestPathname === '/' ? '/index.html' : requestPathname;
+  const filePath = resolvePath(requestPath);
+
+  if (!filePath) {
+    res.writeHead(400, { 'Content-Type': 'text/plain; charset=utf-8' });
+    res.end('Bad Request');
+    return;
+  }
+
+
   const requestPath = requestUrl.pathname === '/' ? '/index.html' : requestUrl.pathname;
   const filePath = resolvePath(requestPath);
 
+ main
   if (!filePath.startsWith(rootDir)) {
     res.writeHead(403, { 'Content-Type': 'text/plain; charset=utf-8' });
     res.end('Forbidden');

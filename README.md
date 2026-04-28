@@ -8,6 +8,7 @@ Frontend app for calculating mutual fund holding value from AMFI NAV data, bundl
 - Supports manual paste of the AMFI text if the source blocks direct browser access
 - Lets you search by fund name and enter units
 - Calculates portfolio value instantly using the latest NAV in the loaded data
+- Keeps search responsive by showing top matching scheme suggestions instead of rendering all schemes at once
 
 ## Files
 
@@ -30,7 +31,11 @@ Frontend app for calculating mutual fund holding value from AMFI NAV data, bundl
 1. Push this repository to GitHub.
 2. In Railway, create a new project and choose **Deploy from GitHub repo**.
 3. Select this repository and branch.
+ codex/fix-issues-for-railway-deployment-chjywf
+4. Railway uses `railway.toml` + `Dockerfile` to build and run the app consistently (`node server.js`).
+
 4. Railway automatically detects Node.js via `package.json` and runs `npm start`.
+main
 5. After deployment, open the generated Railway URL.
 
 ### Railway runtime notes
