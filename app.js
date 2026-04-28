@@ -13,7 +13,8 @@ const SAMPLE_NAV_TEXT = [
 const state = {
   schemes: [],
   selectedScheme: null,
-  sourceLabel: "Waiting for NAV data"
+  sourceLabel: "Waiting for NAV data",
+  filteredSchemeOptions: []
 };
 
 const elements = {
@@ -94,14 +95,62 @@ function setFeedback(message, isError = false) {
 function updateSummary() {
   elements.sourceStatus.textContent = state.sourceLabel;
   elements.schemeCount.textContent = state.schemes.length.toLocaleString("en-IN");
-  elements.latestNavDate.textContent = state.schemes[0]?.date || "-";
+  elements.latestNavDate.textContent = getLatestNavDate(state.schemes) || "-";
+}
+
+function parseAmfiDate(dateText) {
+  const [day, month, year] = dateText.split("-");
+  if (!day || !month || !year) {
+    return null;
+  }
+
+  const monthIndex = [
+    "jan", "feb", "mar", "apr", "may", "jun",
+    "jul", "aug", "sep", "oct", "nov", "dec"
+  ].indexOf(month.toLowerCase());
+
+  if (monthIndex === -1) {
+    return null;
+  }
+
+  const parsedDate = new Date(Date.UTC(Number.parseInt(year, 10), monthIndex, Number.parseInt(day, 10)));
+  if (Number.isNaN(parsedDate.getTime())) {
+    return null;
+  }
+
+  return parsedDate;
+}
+
+function getLatestNavDate(schemes) {
+  let latestDate = null;
+  let latestLabel = "";
+
+  for (const scheme of schemes) {
+    const parsedDate = parseAmfiDate(scheme.date);
+    if (!parsedDate) {
+      continue;
+    }
+
+    if (!latestDate || parsedDate > latestDate) {
+      latestDate = parsedDate;
+      latestLabel = scheme.date;
+    }
+  }
+
+  return latestLabel;
 }
 
 function populateOptions() {
+  const searchValue = elements.schemeSearch.value.trim().toLowerCase();
+  const matchingSchemes = searchValue
+    ? state.schemes.filter((scheme) => scheme.schemeName.toLowerCase().includes(searchValue))
+    : state.schemes;
+
+  state.filteredSchemeOptions = matchingSchemes.slice(0, 200);
   elements.schemeOptions.innerHTML = "";
   const fragment = document.createDocumentFragment();
 
-  for (const scheme of state.schemes) {
+  for (const scheme of state.filteredSchemeOptions) {
     const option = document.createElement("option");
     option.value = scheme.schemeName;
     fragment.appendChild(option);
@@ -112,6 +161,7 @@ function populateOptions() {
 
 function updateSelectedScheme() {
   const searchValue = elements.schemeSearch.value.trim().toLowerCase();
+  populateOptions();
   state.selectedScheme = state.schemes.find((scheme) => scheme.schemeName.toLowerCase() === searchValue) || null;
   updatePortfolioValue();
 }
@@ -144,6 +194,7 @@ function applySchemes(schemes, sourceLabel) {
   state.schemes = schemes;
   state.sourceLabel = sourceLabel;
   state.selectedScheme = null;
+  state.filteredSchemeOptions = [];
   elements.schemeSearch.value = "";
   elements.unitsInput.value = "";
   populateOptions();
